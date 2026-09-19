@@ -1,0 +1,95 @@
+package com.example.incometracker.ui.dashboard
+
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.incometracker.data.DatabaseProvider
+import com.example.incometracker.data.SettingsStore
+import com.example.incometracker.util.*
+import kotlinx.coroutines.flow.*
+import java.time.LocalDate
+import java.time.temporal.TemporalAdjusters
+import kotlin.math.roundToInt
+
+data class DashboardState(
+    val periodType: PeriodType = PeriodType.DAILY,
+    val currencyCode: String = "USD",
+    val currentTotalCents: Long = 0L,
+    val previousTotalCents: Long = 0L,
+    val percent: Double? = null,
+    val chart: List<Pair<String, Long>> = emptyList()
+)
+
+class DashboardViewModel(app: Application) : AndroidViewModel(app) {
+    private val dao = DatabaseProvider.get(app).incomeDao()
+    private val settings = SettingsStore(app)
+
+    private val _period = MutableStateFlow(PeriodType.DAILY)
+    fun setPeriod(p: PeriodType) { _period.value = p }
+
+    private val today = MutableStateFlow(LocalDate.now())
+
+    private val currency = settings.currencyCode
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "USD")
+
+    private val weekStart = settings.weekStart
+        .map { it.toDayOfWeek() }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), java.time.DayOfWeek.MONDAY)
+
+    private val currentTotal = combine(_period, today, weekStart) { p, t, ws -> currentRange(p, t, ws) }
+        .flatMapLatest { r -> dao.observeTotalBetween(r.start, r.end) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0L)
+
+    private val previousTotal = combine(_period, today, weekStart) { p, t, ws -> previousRange(p, t, ws) }
+        .flatMapLatest { r -> dao.observeTotalBetween(r.start, r.end) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0L)
+
+    private val chart = combine(_period, today, weekStart) { p, t, ws ->
+        val end = t
+        val start = when (p) {
+            PeriodType.DAILY -> end.minusDays(29)
+            PeriodType.WEEKLY -> end.minusWeeks(11).with(TemporalAdjusters.previousOrSame(ws))
+            PeriodType.MONTHLY -> end.minusMonths(11).withDayOfMonth(1)
+        }
+        DateRange(start, end)
+    }.flatMapLatest { r -> dao.observeDailyTotalsBetween(r.start, r.end) }
+        .combine(_period) { daily, p ->
+            when (p) {
+                PeriodType.DAILY -> daily.map { "%02d-%02d".format(it.date.monthValue, it.date.dayOfMonth) to it.totalCents }
+                PeriodType.WEEKLY -> {
+                    val map = linkedMapOf<LocalDate, Long>()
+                    for (d in daily) {
+                        val ws = d.date.with(TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY))
+                        map[ws] = (map[ws] ?: 0L) + d.totalCents
+                    }
+                    map.entries.map { (k, v) ->
+                        val w = k.get(java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR)
+                        "Wk %02d".format(w) to v
+                    }
+                }
+                PeriodType.MONTHLY -> {
+                    val map = linkedMapOf<java.time.YearMonth, Long>()
+                    for (d in daily) {
+                        val ym = java.time.YearMonth.from(d.date)
+                        map[ym] = (map[ym] ?: 0L) + d.totalCents
+                    }
+                    map.entries.map { (ym, v) ->
+                        val label = ym.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
+                        label to v
+                    }
+                }
+            }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val state: StateFlow<DashboardState> =
+        combine(_period, currency, currentTotal, previousTotal, chart) { p, cc, cur, prev, ch ->
+            DashboardState(
+                periodType = p,
+                currencyCode = cc,
+                currentTotalCents = cur,
+                previousTotalCents = prev,
+                percent = percentChange(cur, prev),
+                chart = ch
+            )
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DashboardState())
+}

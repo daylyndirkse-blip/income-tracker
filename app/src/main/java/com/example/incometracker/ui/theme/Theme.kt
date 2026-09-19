@@ -8,17 +8,22 @@ import androidx.compose.ui.graphics.Color
 private val NeonGreen = Color(0xFFB6F35C)
 private val Bg = Color(0xFF0B0E10)
 private val Surface = Color(0xFF11161A)
+private val Surface2 = Color(0xFF161D22)
 private val TextHigh = Color(0xFFEAF0F6)
+private val TextMed = Color(0xFFB8C2CC)
 
 private val Scheme = darkColorScheme(
-  primary = NeonGreen,
-  background = Bg,
-  surface = Surface,
-  onBackground = TextHigh,
-  onSurface = TextHigh
+    primary = NeonGreen,
+    background = Bg,
+    surface = Surface,
+    surfaceContainer = Surface2,
+    onPrimary = Color(0xFF071008),
+    onBackground = TextHigh,
+    onSurface = TextHigh,
+    onSurfaceVariant = TextMed
 )
 
 @Composable
 fun IncomeTheme(content: @Composable () -> Unit) {
-  MaterialTheme(colorScheme = Scheme, content = content)
+    MaterialTheme(colorScheme = Scheme, typography = Typography, content = content)
 }
