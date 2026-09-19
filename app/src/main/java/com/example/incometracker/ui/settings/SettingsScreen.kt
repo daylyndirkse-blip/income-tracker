@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.incometracker.ui.components.SlideInContainer
+import com.example.incometracker.ui.components.*.*.SlideInContainer
 import com.example.incometracker.ui.theme.*
 import com.example.incometracker.util.WeekStart
 

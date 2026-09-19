@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.incometracker.ui.charts.BarChartWithLabels
 import com.example.incometracker.ui.charts.LineChartWithLabels
-import com.example.incometracker.ui.components.*
+import com.example.incometracker.ui.components.*.*
 import com.example.incometracker.ui.theme.*
 import com.example.incometracker.util.PeriodType
 import com.example.incometracker.util.formatCents

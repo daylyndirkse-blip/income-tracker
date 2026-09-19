@@ -26,8 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.incometracker.data.IncomeEntryWithSource
-import com.example.incometracker.ui.components.AnimatedAmount
-import com.example.incometracker.ui.components.SlideInContainer
+import com.example.incometracker.ui.components.*.AnimatedAmount
 import com.example.incometracker.ui.theme.*
 import com.example.incometracker.util.formatCents
 import com.example.incometracker.util.toDayOfWeek
