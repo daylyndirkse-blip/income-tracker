@@ -1,6 +1,8 @@
 package com.example.incometracker
 
 import android.os.Bundle
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -43,13 +45,43 @@ fun AppRoot() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MainScaffoldNav() {
     val nav = rememberNavController()
+    val backStack by nav.currentBackStackEntryAsState()
+    val current = backStack?.destination?.route
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-        bottomBar = { BottomBar(nav) }
+        bottomBar = {
+            NavigationBar {
+                NavigationBarItem(
+                    selected = current == Route.Dashboard.value,
+                    onClick = { nav.navigate(Route.Dashboard.value) { launchSingleTop = true; popUpTo(Route.Dashboard.value) } },
+                    icon = { Icon(androidx.compose.material.icons.Icons.Default.Home, contentDescription = "Home") },
+                    label = { Text("Home") }
+                )
+                NavigationBarItem(
+                    selected = current == Route.Calendar.value,
+                    onClick = { nav.navigate(Route.Calendar.value) { launchSingleTop = true; popUpTo(Route.Dashboard.value) } },
+                    icon = { Icon(androidx.compose.material.icons.Icons.Default.DateRange, contentDescription = "Calendar") },
+                    label = { Text("Calendar") }
+                )
+                NavigationBarItem(
+                    selected = current == Route.Analytics.value,
+                    onClick = { nav.navigate(Route.Analytics.value) { launchSingleTop = true; popUpTo(Route.Dashboard.value) } },
+                    icon = { Icon(androidx.compose.material.icons.Icons.Default.BarChart, contentDescription = "Analytics") },
+                    label = { Text("Analytics") }
+                )
+                NavigationBarItem(
+                    selected = current == Route.Settings.value,
+                    onClick = { nav.navigate(Route.Settings.value) { launchSingleTop = true; popUpTo(Route.Dashboard.value) } },
+                    icon = { Icon(androidx.compose.material.icons.Icons.Default.Settings, contentDescription = "Settings") },
+                    label = { Text("Settings") }
+                )
+            }
+        }
     ) { padding ->
         NavHost(
             navController = nav,
@@ -81,7 +113,6 @@ private fun MainScaffoldNav() {
                 val entryId = backStack.arguments?.getLong("entryId") ?: -1L
                 val initialDate = if (epochDay == -1L) null else LocalDate.ofEpochDay(epochDay)
                 val editId = if (entryId == -1L) null else entryId
-
                 AddIncomeScreen(
                     onDone = { nav.popBackStack() },
                     initialDate = initialDate,
@@ -89,38 +120,5 @@ private fun MainScaffoldNav() {
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun BottomBar(nav: androidx.navigation.NavController) {
-    val backStack by nav.currentBackStackEntryAsState()
-    val current = backStack?.destination?.route
-
-    NavigationBar {
-        NavigationBarItem(
-            selected = current == Route.Dashboard.value,
-            onClick = { nav.navigate(Route.Dashboard.value) { launchSingleTop = true; popUpTo(Route.Dashboard.value) } },
-            icon = { Icon(androidx.compose.material.icons.Icons.Default.Home, contentDescription = "Home") },
-            label = { Text("Home") }
-        )
-        NavigationBarItem(
-            selected = current == Route.Calendar.value,
-            onClick = { nav.navigate(Route.Calendar.value) { launchSingleTop = true; popUpTo(Route.Dashboard.value) } },
-            icon = { Icon(androidx.compose.material.icons.Icons.Default.CalendarMonth, contentDescription = "Calendar") },
-            label = { Text("Calendar") }
-        )
-        NavigationBarItem(
-            selected = current == Route.Analytics.value,
-            onClick = { nav.navigate(Route.Analytics.value) { launchSingleTop = true; popUpTo(Route.Dashboard.value) } },
-            icon = { Icon(androidx.compose.material.icons.Icons.Default.Insights, contentDescription = "Analytics") },
-            label = { Text("Analytics") }
-        )
-        NavigationBarItem(
-            selected = current == Route.Settings.value,
-            onClick = { nav.navigate(Route.Settings.value) { launchSingleTop = true; popUpTo(Route.Dashboard.value) } },
-            icon = { Icon(androidx.compose.material.icons.Icons.Default.Settings, contentDescription = "Settings") },
-            label = { Text("Settings") }
-        )
     }
 }

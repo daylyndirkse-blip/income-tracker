@@ -11,6 +11,7 @@ import com.example.incometracker.util.PeriodType
 import com.example.incometracker.util.formatCents
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(onAdd: () -> Unit, vm: DashboardViewModel = viewModel()) {
     val st by vm.state.collectAsState()
@@ -34,13 +35,11 @@ fun DashboardScreen(onAdd: () -> Unit, vm: DashboardViewModel = viewModel()) {
                     onClick = { vm.setPeriod(PeriodType.DAILY) },
                     shape = SegmentedButtonDefaults.itemShape(0, 3)
                 ) { Text("Daily") }
-
                 SegmentedButton(
                     selected = st.periodType == PeriodType.WEEKLY,
                     onClick = { vm.setPeriod(PeriodType.WEEKLY) },
                     shape = SegmentedButtonDefaults.itemShape(1, 3)
                 ) { Text("Weekly") }
-
                 SegmentedButton(
                     selected = st.periodType == PeriodType.MONTHLY,
                     onClick = { vm.setPeriod(PeriodType.MONTHLY) },

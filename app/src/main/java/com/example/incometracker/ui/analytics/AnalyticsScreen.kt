@@ -14,6 +14,7 @@ import com.example.incometracker.util.PeriodType
 import com.example.incometracker.util.formatCents
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnalyticsScreen(vm: AnalyticsViewModel = viewModel()) {
     val st by vm.state.collectAsState()
@@ -29,14 +30,14 @@ fun AnalyticsScreen(vm: AnalyticsViewModel = viewModel()) {
         Text("Analytics", style = MaterialTheme.typography.titleLarge)
 
         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-            SegmentedButton(st.periodType == PeriodType.DAILY, { vm.setPeriod(PeriodType.DAILY) }, shape = SegmentedButtonDefaults.itemShape(0,3)) { Text("Daily") }
-            SegmentedButton(st.periodType == PeriodType.WEEKLY, { vm.setPeriod(PeriodType.WEEKLY) }, shape = SegmentedButtonDefaults.itemShape(1,3)) { Text("Weekly") }
-            SegmentedButton(st.periodType == PeriodType.MONTHLY, { vm.setPeriod(PeriodType.MONTHLY) }, shape = SegmentedButtonDefaults.itemShape(2,3)) { Text("Monthly") }
+            SegmentedButton(st.periodType == PeriodType.DAILY, { vm.setPeriod(PeriodType.DAILY) }, shape = SegmentedButtonDefaults.itemShape(0, 3)) { Text("Daily") }
+            SegmentedButton(st.periodType == PeriodType.WEEKLY, { vm.setPeriod(PeriodType.WEEKLY) }, shape = SegmentedButtonDefaults.itemShape(1, 3)) { Text("Weekly") }
+            SegmentedButton(st.periodType == PeriodType.MONTHLY, { vm.setPeriod(PeriodType.MONTHLY) }, shape = SegmentedButtonDefaults.itemShape(2, 3)) { Text("Monthly") }
         }
 
         SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-            SegmentedButton(st.chartType == ChartType.LINE, { vm.setChartType(ChartType.LINE) }, shape = SegmentedButtonDefaults.itemShape(0,2)) { Text("Line") }
-            SegmentedButton(st.chartType == ChartType.BAR, { vm.setChartType(ChartType.BAR) }, shape = SegmentedButtonDefaults.itemShape(1,2)) { Text("Bar") }
+            SegmentedButton(st.chartType == ChartType.LINE, { vm.setChartType(ChartType.LINE) }, shape = SegmentedButtonDefaults.itemShape(0, 2)) { Text("Line") }
+            SegmentedButton(st.chartType == ChartType.BAR, { vm.setChartType(ChartType.BAR) }, shape = SegmentedButtonDefaults.itemShape(1, 2)) { Text("Bar") }
         }
 
         Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)) {

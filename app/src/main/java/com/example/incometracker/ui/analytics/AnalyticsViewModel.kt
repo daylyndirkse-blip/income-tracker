@@ -34,20 +34,26 @@ class AnalyticsViewModel(app: Application) : AndroidViewModel(app) {
     fun setPeriod(p: PeriodType) { _period.value = p }
     fun setChartType(t: ChartType) { _chartType.value = t }
 
-    private val currency = settings.currencyCode.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "USD")
-    private val weekStart = settings.weekStart.map { it.toDayOfWeek() }
+    private val currency = settings.currencyCode
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), "USD")
+
+    private val weekStart = settings.weekStart
+        .map { it.toDayOfWeek() }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), java.time.DayOfWeek.MONDAY)
 
-    private val currentTotal = combine(_period, today, weekStart) { p, t, ws -> currentRange(p, t, ws) }
-        .flatMapLatest { r -> dao.observeTotalBetween(r.start, r.end) }
+    private val currentTotal = combine(_period, today, weekStart) { p, t, ws ->
+        currentRange(p, t, ws)
+    }.flatMapLatest { r -> dao.observeTotalBetween(r.start, r.end) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0L)
 
-    private val previousTotal = combine(_period, today, weekStart) { p, t, ws -> previousRange(p, t, ws) }
-        .flatMapLatest { r -> dao.observeTotalBetween(r.start, r.end) }
+    private val previousTotal = combine(_period, today, weekStart) { p, t, ws ->
+        previousRange(p, t, ws)
+    }.flatMapLatest { r -> dao.observeTotalBetween(r.start, r.end) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0L)
 
-    private val bySource = combine(_period, today, weekStart) { p, t, ws -> currentRange(p, t, ws) }
-        .flatMapLatest { r -> dao.observeTotalsBySourceBetween(r.start, r.end) }
+    private val bySource = combine(_period, today, weekStart) { p, t, ws ->
+        currentRange(p, t, ws)
+    }.flatMapLatest { r -> dao.observeTotalsBySourceBetween(r.start, r.end) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     private val chart = combine(_period, today, weekStart) { p, t, ws ->
@@ -61,7 +67,9 @@ class AnalyticsViewModel(app: Application) : AndroidViewModel(app) {
     }.flatMapLatest { r -> dao.observeDailyTotalsBetween(r.start, r.end) }
         .combine(_period) { daily, p ->
             when (p) {
-                PeriodType.DAILY -> daily.map { "%02d-%02d".format(it.date.monthValue, it.date.dayOfMonth) to it.totalCents }
+                PeriodType.DAILY -> daily.map {
+                    "%02d-%02d".format(it.date.monthValue, it.date.dayOfMonth) to it.totalCents
+                }
                 PeriodType.WEEKLY -> {
                     val map = linkedMapOf<LocalDate, Long>()
                     for (d in daily) {
@@ -69,8 +77,7 @@ class AnalyticsViewModel(app: Application) : AndroidViewModel(app) {
                         map[ws] = (map[ws] ?: 0L) + d.totalCents
                     }
                     map.entries.map { (k, v) ->
-                        val w = k.get(java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR)
-                        "Wk %02d".format(w) to v
+                        "Wk %02d".format(k.get(java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR)) to v
                     }
                 }
                 PeriodType.MONTHLY -> {
@@ -80,24 +87,33 @@ class AnalyticsViewModel(app: Application) : AndroidViewModel(app) {
                         map[ym] = (map[ym] ?: 0L) + d.totalCents
                     }
                     map.entries.map { (ym, v) ->
-                        val label = ym.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() }
-                        label to v
+                        ym.month.name.take(3).lowercase().replaceFirstChar { it.uppercase() } to v
                     }
                 }
             }
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    val state: StateFlow<AnalyticsState> =
-        combine(_period, _chartType, currency, currentTotal, previousTotal, chart, bySource) { p, ct, cc, cur, prev, ch, src ->
-            AnalyticsState(
-                periodType = p,
-                chartType = ct,
-                currencyCode = cc,
-                currentTotalCents = cur,
-                previousTotalCents = prev,
-                percent = percentChange(cur, prev),
-                chart = ch,
-                bySource = src
-            )
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AnalyticsState())
+    // Fix: combine 5 flows (max 5 params without explicit type issues)
+    val state: StateFlow<AnalyticsState> = combine(
+        combine(_period, _chartType, currency) { p, ct, cc ->
+            Triple(p, ct, cc)
+        },
+        combine(currentTotal, previousTotal) { cur, prev ->
+            Pair(cur, prev)
+        },
+        combine(chart, bySource) { ch, src ->
+            Pair(ch, src)
+        }
+    ) { (p, ct, cc), (cur, prev), (ch, src) ->
+        AnalyticsState(
+            periodType = p,
+            chartType = ct,
+            currencyCode = cc,
+            currentTotalCents = cur,
+            previousTotalCents = prev,
+            percent = percentChange(cur, prev),
+            chart = ch,
+            bySource = src
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AnalyticsState())
 }

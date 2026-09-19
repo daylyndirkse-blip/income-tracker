@@ -20,16 +20,22 @@ class RecurringIncomeWorker(
 
         val rules = dao.getActiveRules()
         for (rule in rules) {
-            val last = rule.lastGeneratedDate
-            var next: LocalDate? = if (last == null) rule.anchorDate else when (rule.recurrence) {
-                Recurrence.DAILY -> last.plusDays(1)
-                Recurrence.WEEKLY -> last.plusWeeks(1)
-                Recurrence.MONTHLY -> last.plusMonths(1)
-                Recurrence.NONE -> null
+            val last: LocalDate? = rule.lastGeneratedDate
+
+            val firstNext: LocalDate = if (last == null) {
+                rule.anchorDate
+            } else {
+                when (rule.recurrence) {
+                    Recurrence.DAILY -> last.plusDays(1)
+                    Recurrence.WEEKLY -> last.plusWeeks(1)
+                    Recurrence.MONTHLY -> last.plusMonths(1)
+                    Recurrence.NONE -> continue
+                }
             }
 
-            if (next == null) continue
+            if (rule.recurrence == Recurrence.NONE) continue
 
+            var next: LocalDate = firstNext
             val newEntries = mutableListOf<IncomeEntryEntity>()
             var newestGenerated: LocalDate? = null
 
