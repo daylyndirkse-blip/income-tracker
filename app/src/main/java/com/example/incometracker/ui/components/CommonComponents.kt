@@ -84,17 +84,18 @@ fun ShimmerBox(modifier: Modifier = Modifier) {
 
 @Composable
 fun AnimatedAmount(
-    amount: Double,
-    modifier: Modifier = Modifier,
-    style: androidx.compose.ui.text.TextStyle = MaterialTheme.typography.headlineMedium,
-    prefix: String = "$"
+    targetCents: Long,
+    currencyCode: String = "USD",
+    fontSize: androidx.compose.ui.unit.TextUnit = 32.sp,
+    modifier: Modifier = Modifier
 ) {
     var animatedValue by remember { mutableStateOf(0.0) }
+    val targetValue = targetCents / 100.0
     
-    LaunchedEffect(amount) {
+    LaunchedEffect(targetCents) {
         animate(
             initialValue = animatedValue,
-            targetValue = amount,
+            targetValue = targetValue,
             animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
         ) { value, _ ->
             animatedValue = value
@@ -102,19 +103,22 @@ fun AnimatedAmount(
     }
     
     Text(
-        text = "$prefix%.2f".format(animatedValue),
-        style = style,
+        text = "$${"%.2f".format(animatedValue)}",
+        fontSize = fontSize,
+        fontWeight = FontWeight.Bold,
         modifier = modifier
     )
 }
 
 @Composable
 fun PercentBadge(
-    percent: Float,
+    percent: Double?,
     modifier: Modifier = Modifier
 ) {
-    val color = if (percent >= 0) Color(0xFF4CAF50) else Color(0xFFF44336)
-    val icon = if (percent >= 0) "↑" else "↓"
+    if (percent == null) return
+    val percentFloat = percent.toFloat()
+    val color = if (percentFloat >= 0) Color(0xFF4CAF50) else Color(0xFFF44336)
+    val icon = if (percentFloat >= 0) "↑" else "↓"
     
     Surface(
         modifier = modifier,
@@ -133,7 +137,7 @@ fun PercentBadge(
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "%.1f%%".format(kotlin.math.abs(percent)),
+                text = "%.1f%%".format(kotlin.math.abs(percentFloat)),
                 color = color,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Medium
