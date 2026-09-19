@@ -3,6 +3,11 @@ package com.example.incometracker
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -58,26 +63,46 @@ private fun MainScaffoldNav() {
             NavigationBar {
                 NavigationBarItem(
                     selected = current == Route.Dashboard.value,
-                    onClick = { nav.navigate(Route.Dashboard.value) { launchSingleTop = true; popUpTo(Route.Dashboard.value) } },
-                    icon = { Icon(androidx.compose.material.icons.Icons.Default.Home, contentDescription = "Home") },
+                    onClick = {
+                        nav.navigate(Route.Dashboard.value) {
+                            launchSingleTop = true
+                            popUpTo(Route.Dashboard.value)
+                        }
+                    },
+                    icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
                     label = { Text("Home") }
                 )
                 NavigationBarItem(
                     selected = current == Route.Calendar.value,
-                    onClick = { nav.navigate(Route.Calendar.value) { launchSingleTop = true; popUpTo(Route.Dashboard.value) } },
-                    icon = { Icon(androidx.compose.material.icons.Icons.Default.DateRange, contentDescription = "Calendar") },
+                    onClick = {
+                        nav.navigate(Route.Calendar.value) {
+                            launchSingleTop = true
+                            popUpTo(Route.Dashboard.value)
+                        }
+                    },
+                    icon = { Icon(Icons.Filled.CalendarMonth, contentDescription = "Calendar") },
                     label = { Text("Calendar") }
                 )
                 NavigationBarItem(
                     selected = current == Route.Analytics.value,
-                    onClick = { nav.navigate(Route.Analytics.value) { launchSingleTop = true; popUpTo(Route.Dashboard.value) } },
-                    icon = { Icon(androidx.compose.material.icons.Icons.Default.BarChart, contentDescription = "Analytics") },
+                    onClick = {
+                        nav.navigate(Route.Analytics.value) {
+                            launchSingleTop = true
+                            popUpTo(Route.Dashboard.value)
+                        }
+                    },
+                    icon = { Icon(Icons.Filled.BarChart, contentDescription = "Analytics") },
                     label = { Text("Analytics") }
                 )
                 NavigationBarItem(
                     selected = current == Route.Settings.value,
-                    onClick = { nav.navigate(Route.Settings.value) { launchSingleTop = true; popUpTo(Route.Dashboard.value) } },
-                    icon = { Icon(androidx.compose.material.icons.Icons.Default.Settings, contentDescription = "Settings") },
+                    onClick = {
+                        nav.navigate(Route.Settings.value) {
+                            launchSingleTop = true
+                            popUpTo(Route.Dashboard.value)
+                        }
+                    },
+                    icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
                     label = { Text("Settings") }
                 )
             }
@@ -93,15 +118,21 @@ private fun MainScaffoldNav() {
             }
             composable(Route.Calendar.value) {
                 CalendarScreen(
-                    onAddForDate = { date -> nav.navigate("add_income?date=${date.toEpochDay()}&entryId=-1") },
-                    onEditEntry = { id -> nav.navigate("add_income?date=-1&entryId=$id") }
+                    onAddForDate = { date ->
+                        nav.navigate("add_income?date=${date.toEpochDay()}&entryId=-1")
+                    },
+                    onEditEntry = { id ->
+                        nav.navigate("add_income?date=-1&entryId=$id")
+                    }
                 )
             }
             composable(Route.Analytics.value) { AnalyticsScreen() }
             composable(Route.Settings.value) {
                 SettingsScreen(onOpenPinSetup = { nav.navigate(Route.PinSetup.value) })
             }
-            composable(Route.PinSetup.value) { PinSetupScreen(onDone = { nav.popBackStack() }) }
+            composable(Route.PinSetup.value) {
+                PinSetupScreen(onDone = { nav.popBackStack() })
+            }
             composable(
                 route = Route.AddIncome.value,
                 arguments = listOf(
