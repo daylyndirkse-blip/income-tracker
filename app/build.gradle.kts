@@ -39,6 +39,9 @@ dependencies {
   implementation("androidx.compose.material3:material3")
   implementation("androidx.compose.material:material-icons-extended")
 
+  // Force AndroidX Core to a compileSdk-34 compatible version:
+  implementation("androidx.core:core-ktx:1.13.1")
+
   // Needed for Theme.Material3.* XML styles
   implementation("com.google.android.material:material:1.12.0")
 
@@ -72,4 +75,11 @@ dependencies {
   // Charts (Vico)
   implementation("com.patrykandpatrick.vico:compose:2.1.2")
   implementation("com.patrykandpatrick.vico:compose-m3:2.1.2")
+}
+
+configurations.configureEach {
+  resolutionStrategy.force(
+    "androidx.core:core:1.13.1",
+    "androidx.core:core-ktx:1.13.1"
+  )
 }
