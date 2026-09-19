@@ -1,4 +1,5 @@
 package com.example.incometracker.ui.lock
+import com.example.incometracker.ui.components.*
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
