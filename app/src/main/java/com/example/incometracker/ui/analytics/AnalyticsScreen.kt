@@ -8,17 +8,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.incometracker.ui.charts.BarChartWithLabels
+import com.example.incometracker.ui.charts.LineChartWithLabels
 import com.example.incometracker.util.PeriodType
 import com.example.incometracker.util.formatCents
-import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
-import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
-import com.patrykandpatrick.vico.compose.chart.Chart
-import com.patrykandpatrick.vico.compose.chart.column.ColumnChart
-import com.patrykandpatrick.vico.compose.chart.line.LineChart
-import com.patrykandpatrick.vico.compose.m3.rememberM3ChartStyle
-import com.patrykandpatrick.vico.core.axis.AxisPosition
-import com.patrykandpatrick.vico.core.axis.formatter.AxisValueFormatter
-import com.patrykandpatrick.vico.core.entry.entryModelOf
 import kotlin.math.roundToInt
 
 @Composable
@@ -57,7 +50,10 @@ fun AnalyticsScreen(vm: AnalyticsViewModel = viewModel()) {
         Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)) {
             Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text("Trend", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                LabeledChart(points = st.chart, chartType = st.chartType)
+                when (st.chartType) {
+                    ChartType.LINE -> LineChartWithLabels(points = st.chart)
+                    ChartType.BAR -> BarChartWithLabels(points = st.chart)
+                }
             }
         }
 
@@ -73,37 +69,4 @@ fun AnalyticsScreen(vm: AnalyticsViewModel = viewModel()) {
             }
         }
     }
-}
-
-@Composable
-private fun LabeledChart(points: List<Pair<String, Long>>, chartType: ChartType) {
-    val safe = if (points.isEmpty()) listOf("" to 0L) else points
-    val labels = safe.map { it.first }
-    val y = safe.map { it.second / 100f }.toTypedArray()
-    val model = entryModelOf(*y)
-
-    val labelStep = when {
-        labels.size <= 12 -> 1
-        labels.size <= 18 -> 2
-        else -> 5
-    }
-
-    val bottomAxis = rememberBottomAxis(
-        valueFormatter = AxisValueFormatter<AxisPosition.Horizontal.Bottom> { value, _ ->
-            val i = value.roundToInt().coerceIn(0, labels.lastIndex)
-            val keyTick = (i == 0) || (i == labels.lastIndex) || (i % labelStep == 0)
-            if (keyTick) labels[i] else ""
-        }
-    )
-
-    Chart(
-        chart = when (chartType) {
-            ChartType.LINE -> LineChart()
-            ChartType.BAR -> ColumnChart()
-        },
-        model = model,
-        chartStyle = rememberM3ChartStyle(),
-        startAxis = rememberStartAxis(),
-        bottomAxis = bottomAxis
-    )
 }
