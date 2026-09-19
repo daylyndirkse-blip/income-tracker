@@ -89,8 +89,8 @@ fun AnimatedAmount(
     fontSize: androidx.compose.ui.unit.TextUnit = 32.sp,
     modifier: Modifier = Modifier
 ) {
-    var animatedValue by remember { mutableStateOf(0.0) }
-    val targetValue = targetCents / 100.0
+    var animatedValue by remember { mutableStateOf(0f) }
+    val targetValue = targetCents / 100f
     
     LaunchedEffect(targetCents) {
         animate(
@@ -98,7 +98,7 @@ fun AnimatedAmount(
             targetValue = targetValue,
             animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
         ) { value, _ ->
-            animatedValue = value
+            animatedValue = value.toDouble()
         }
     }
     
