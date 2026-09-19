@@ -5,25 +5,38 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val NeonGreen = Color(0xFFB6F35C)
-private val Bg = Color(0xFF0B0E10)
-private val Surface = Color(0xFF11161A)
-private val Surface2 = Color(0xFF161D22)
-private val TextHigh = Color(0xFFEAF0F6)
-private val TextMed = Color(0xFFB8C2CC)
+// Core palette
+val Purple = Color(0xFF7C3AED)
+val PurpleLight = Color(0xFF9F67FF)
+val PurpleDim = Color(0xFF3D1F78)
+val Bg = Color(0xFF060309)
+val CardBg = Color(0xFF1B1B19)
+val CardBg2 = Color(0xFF232320)
+val TextHigh = Color(0xFFFFFFFF)
+val TextMed = Color(0xFFAAAAAA)
+val TextLow = Color(0xFF666666)
+val Success = Color(0xFF22C55E)
+val Danger = Color(0xFFEF4444)
 
 private val Scheme = darkColorScheme(
-    primary = NeonGreen,
+    primary = Purple,
+    primaryContainer = PurpleDim,
+    onPrimary = Color.White,
     background = Bg,
-    surface = Surface,
-    surfaceContainer = Surface2,
-    onPrimary = Color(0xFF071008),
+    surface = CardBg,
+    surfaceContainer = CardBg2,
     onBackground = TextHigh,
     onSurface = TextHigh,
-    onSurfaceVariant = TextMed
+    onSurfaceVariant = TextMed,
+    secondary = PurpleLight,
+    error = Danger
 )
 
 @Composable
 fun IncomeTheme(content: @Composable () -> Unit) {
-    MaterialTheme(colorScheme = Scheme, typography = Typography, content = content)
+    MaterialTheme(
+        colorScheme = Scheme,
+        typography = Typography,
+        content = content
+    )
 }
