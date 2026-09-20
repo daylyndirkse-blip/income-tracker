@@ -1,6 +1,5 @@
 package com.example.incometracker.ui.settings
 
-import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -14,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.incometracker.data.ThemePreferences
-import com.example.incometracker.ui.categories.CategoriesActivity
 import com.example.incometracker.ui.components.*
 import kotlinx.coroutines.launch
 
@@ -62,20 +60,18 @@ fun SettingsScreen(onBack: () -> Unit) {
 
             SlideInContainer(delay = 100) {
                 SettingItem(
-                    icon = Icons.Default.Category,
-                    title = "Categories",
-                    subtitle = "Manage custom categories",
-                    onClick = {
-                        context.startActivity(Intent(context, CategoriesActivity::class.java))
-                    }
+                    icon = Icons.Default.Lock,
+                    title = "Security",
+                    subtitle = "PIN & biometric settings",
+                    onClick = { }
                 )
             }
 
             SlideInContainer(delay = 200) {
                 SettingItem(
-                    icon = Icons.Default.Lock,
-                    title = "Security",
-                    subtitle = "PIN & biometric settings",
+                    icon = Icons.Default.Category,
+                    title = "Categories",
+                    subtitle = "Manage custom categories",
                     onClick = { }
                 )
             }
