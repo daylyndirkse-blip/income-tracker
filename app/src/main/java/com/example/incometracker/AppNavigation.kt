@@ -70,8 +70,7 @@ fun AppNavigation() {
         ) {
             composable(Screen.Dashboard.route) {
                 DashboardScreen(
-                    onAdd = { },
-                    onEntryClick = { }
+                    onAdd = { }
                 )
             }
             
