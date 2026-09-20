@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
             }
             
             IncomeTheme(darkTheme = darkTheme) {
-                AppNavigation()
+                IncomeApp()
             }
         }
     }

@@ -5,34 +5,53 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
+// Custom color definitions
+val Purple = Color(0xFF6750A4)
+val PurpleLight = Color(0xFF9575CD)
+val PurpleDim = Color(0xFF2D2640)
+val Bg = Color(0xFFF5F5F5)
+val BgDark = Color(0xFF121212)
+val CardBg = Color(0xFFFFFFFF)
+val CardBgDark = Color(0xFF1E1E1E)
+val CardBg2 = Color(0xFFF8F8F8)
+val CardBg2Dark = Color(0xFF2A2A2A)
+val TextHigh = Color(0xFF1C1C1C)
+val TextHighDark = Color(0xFFE0E0E0)
+val TextMed = Color(0xFF666666)
+val TextMedDark = Color(0xFFAAAAAA)
+val TextLow = Color(0xFF999999)
+val TextLowDark = Color(0xFF888888)
+val Danger = Color(0xFFE53935)
+val Success = Color(0xFF4CAF50)
+
 // Light theme colors
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF6750A4),
-    primaryContainer = Color(0xFF2D2640),
+    primary = Purple,
+    primaryContainer = PurpleDim,
     onPrimary = Color.White,
-    background = Color(0xFFF5F5F5),
-    surface = Color(0xFFFFFFFF),
-    surfaceContainer = Color(0xFFF8F8F8),
-    onBackground = Color(0xFF1C1C1C),
-    onSurface = Color(0xFF1C1C1C),
-    onSurfaceVariant = Color(0xFF666666),
-    secondary = Color(0xFF9575CD),
-    error = Color(0xFFE53935)
+    background = Bg,
+    surface = CardBg,
+    surfaceContainer = CardBg2,
+    onBackground = TextHigh,
+    onSurface = TextHigh,
+    onSurfaceVariant = TextMed,
+    secondary = PurpleLight,
+    error = Danger
 )
 
 // Dark theme colors
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFFBB86FC),
-    primaryContainer = Color(0xFF3700B3),
+    primary = PurpleLight,
+    primaryContainer = Purple,
     onPrimary = Color.Black,
-    background = Color(0xFF121212),
-    surface = Color(0xFF1E1E1E),
-    surfaceContainer = Color(0xFF2A2A2A),
-    onBackground = Color(0xFFE0E0E0),
-    onSurface = Color(0xFFE0E0E0),
-    onSurfaceVariant = Color(0xFFAAAAAA),
-    secondary = Color(0xFF9575CD),
-    error = Color(0xFFCF6679)
+    background = BgDark,
+    surface = CardBgDark,
+    surfaceContainer = CardBg2Dark,
+    onBackground = TextHighDark,
+    onSurface = TextHighDark,
+    onSurfaceVariant = TextMedDark,
+    secondary = PurpleLight,
+    error = Danger
 )
 
 @Composable
