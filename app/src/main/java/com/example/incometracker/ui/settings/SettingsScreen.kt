@@ -1,6 +1,5 @@
 package com.example.incometracker.ui.settings
 
-import android.app.Application
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -13,12 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.incometracker.data.AppDatabase
 import com.example.incometracker.data.ThemePreferences
 import com.example.incometracker.ui.components.*
-import com.example.incometracker.util.CsvExporter
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,7 +25,6 @@ fun SettingsScreen(onBack: () -> Unit) {
     val scope = rememberCoroutineScope()
     
     var showThemeDialog by remember { mutableStateOf(false) }
-    var isExporting by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -66,34 +60,18 @@ fun SettingsScreen(onBack: () -> Unit) {
 
             SlideInContainer(delay = 100) {
                 SettingItem(
-                    icon = Icons.Default.FileDownload,
-                    title = "Export to CSV",
-                    subtitle = "Download your income data",
-                    onClick = {
-                        isExporting = true
-                        scope.launch {
-                            try {
-                                val app = context.applicationContext as Application
-                                val db = AppDatabase.getDatabase(app, scope)
-                                val records = db.incomeDao().getAllRecords().first()
-                                
-                                val file = CsvExporter.exportToCsv(context, records)
-                                CsvExporter.shareFile(context, file)
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            } finally {
-                                isExporting = false
-                            }
-                        }
-                    }
+                    icon = Icons.Default.Lock,
+                    title = "Security",
+                    subtitle = "PIN & biometric settings",
+                    onClick = { }
                 )
             }
 
             SlideInContainer(delay = 200) {
                 SettingItem(
-                    icon = Icons.Default.Lock,
-                    title = "Security",
-                    subtitle = "PIN & biometric settings",
+                    icon = Icons.Default.Category,
+                    title = "Categories",
+                    subtitle = "Manage custom categories",
                     onClick = { }
                 )
             }
@@ -102,7 +80,7 @@ fun SettingsScreen(onBack: () -> Unit) {
                 SettingItem(
                     icon = Icons.Default.Backup,
                     title = "Backup & Restore",
-                    subtitle = "Cloud backup options",
+                    subtitle = "Export or import data",
                     onClick = { }
                 )
             }
@@ -111,18 +89,9 @@ fun SettingsScreen(onBack: () -> Unit) {
                 SettingItem(
                     icon = Icons.Default.Info,
                     title = "About",
-                    subtitle = "Trackr v1.0.0",
+                    subtitle = "Version 1.0.0",
                     onClick = { }
                 )
-            }
-        }
-        
-        if (isExporting) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
             }
         }
     }
