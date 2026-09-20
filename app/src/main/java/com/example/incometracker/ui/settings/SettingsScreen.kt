@@ -1,201 +1,184 @@
 package com.example.incometracker.ui.settings
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.incometracker.data.ThemePreferences
 import com.example.incometracker.ui.components.*
-import com.example.incometracker.ui.theme.*
-import com.example.incometracker.util.WeekStart
-
-private val SupportedCurrencies = listOf(
-    "USD" to "🇺🇸 USD - US Dollar",
-    "EUR" to "🇪🇺 EUR - Euro",
-    "GBP" to "🇬🇧 GBP - British Pound",
-    "ZAR" to "🇿🇦 ZAR - South African Rand",
-    "KES" to "🇰🇪 KES - Kenyan Shilling",
-    "NGN" to "🇳🇬 NGN - Nigerian Naira",
-    "GHS" to "🇬🇭 GHS - Ghanaian Cedi",
-    "AUD" to "🇦🇺 AUD - Australian Dollar",
-    "CAD" to "🇨🇦 CAD - Canadian Dollar",
-    "INR" to "🇮🇳 INR - Indian Rupee"
-)
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(
-    onOpenPinSetup: () -> Unit,
-    vm: SettingsViewModel = viewModel()
-) {
-    val currency by vm.currency.collectAsState()
-    val weekStart by vm.weekStart.collectAsState()
-    val lockEnabled by vm.lockEnabled.collectAsState()
-    val useBiometric by vm.useBiometric.collectAsState()
-    val pinSet by vm.pinSet.collectAsState()
+fun SettingsScreen(onBack: () -> Unit) {
+    val context = LocalContext.current
+    val themePreferences = remember { ThemePreferences(context) }
+    val themeMode by themePreferences.themeMode.collectAsState(initial = ThemePreferences.ThemeMode.SYSTEM)
+    val scope = rememberCoroutineScope()
+    
+    var showThemeDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(lockEnabled, pinSet) {
-        if (lockEnabled && !pinSet) onOpenPinSetup()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Settings") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                    }
+                }
+            )
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            SlideInContainer(delay = 0) {
+                SettingItem(
+                    icon = Icons.Default.DarkMode,
+                    title = "Theme",
+                    subtitle = when(themeMode) {
+                        ThemePreferences.ThemeMode.LIGHT -> "Light"
+                        ThemePreferences.ThemeMode.DARK -> "Dark"
+                        ThemePreferences.ThemeMode.SYSTEM -> "System Default"
+                    },
+                    onClick = { showThemeDialog = true }
+                )
+            }
+
+            SlideInContainer(delay = 100) {
+                SettingItem(
+                    icon = Icons.Default.Lock,
+                    title = "Security",
+                    subtitle = "PIN & biometric settings",
+                    onClick = { }
+                )
+            }
+
+            SlideInContainer(delay = 200) {
+                SettingItem(
+                    icon = Icons.Default.Category,
+                    title = "Categories",
+                    subtitle = "Manage custom categories",
+                    onClick = { }
+                )
+            }
+
+            SlideInContainer(delay = 300) {
+                SettingItem(
+                    icon = Icons.Default.Backup,
+                    title = "Backup & Restore",
+                    subtitle = "Export or import data",
+                    onClick = { }
+                )
+            }
+
+            SlideInContainer(delay = 400) {
+                SettingItem(
+                    icon = Icons.Default.Info,
+                    title = "About",
+                    subtitle = "Version 1.0.0",
+                    onClick = { }
+                )
+            }
+        }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Bg)
-            .verticalScroll(rememberScrollState())
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        Spacer(Modifier.height(8.dp))
-
-        SlideInContainer(0) {
-            Text("Settings", style = MaterialTheme.typography.headlineLarge, color = Color.White)
-        }
-
-        // Currency
-        SlideInContainer(1) {
-            SettingSection(title = "Currency") {
-                var expanded by remember { mutableStateOf(false) }
-                val selectedLabel = SupportedCurrencies.firstOrNull { it.first == currency }?.second ?: currency
-
-                ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
-                    OutlinedTextField(
-                        value = selectedLabel,
-                        onValueChange = {},
-                        readOnly = true,
-                        modifier = Modifier.menuAnchor().fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Purple,
-                            unfocusedBorderColor = Color(0xFF333333),
-                            focusedContainerColor = CardBg2,
-                            unfocusedContainerColor = CardBg2,
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White
-                        ),
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }
-                    )
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false },
-                        modifier = Modifier.background(CardBg)
-                    ) {
-                        SupportedCurrencies.forEach { (code, label) ->
-                            DropdownMenuItem(
-                                text = { Text(label, color = if (code == currency) Purple else Color.White) },
-                                onClick = { vm.setCurrency(code); expanded = false }
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        // Week start
-        SlideInContainer(2) {
-            SettingSection(title = "Week Starts On") {
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
-                    listOf(WeekStart.MONDAY to "Monday", WeekStart.SUNDAY to "Sunday").forEach { (ws, label) ->
-                        val selected = weekStart == ws
-                        Box(
+    if (showThemeDialog) {
+        AlertDialog(
+            onDismissRequest = { showThemeDialog = false },
+            title = { Text("Choose Theme") },
+            text = {
+                Column {
+                    ThemePreferences.ThemeMode.values().forEach { mode ->
+                        Row(
                             modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(if (selected) Purple else CardBg2)
+                                .fillMaxWidth()
+                                .clickable {
+                                    scope.launch {
+                                        themePreferences.setThemeMode(mode)
+                                        showThemeDialog = false
+                                    }
+                                }
                                 .padding(vertical = 12.dp),
-                            contentAlignment = Alignment.Center
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
+                            RadioButton(
+                                selected = themeMode == mode,
+                                onClick = null
+                            )
+                            Spacer(modifier = Modifier.width(16.dp))
                             Text(
-                                label,
-                                color = if (selected) Color.White else TextMed,
-                                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal
+                                text = when(mode) {
+                                    ThemePreferences.ThemeMode.LIGHT -> "Light"
+                                    ThemePreferences.ThemeMode.DARK -> "Dark"
+                                    ThemePreferences.ThemeMode.SYSTEM -> "System Default"
+                                }
                             )
                         }
                     }
                 }
-            }
-        }
-
-        // Security
-        SlideInContainer(3) {
-            SettingSection(title = "Security") {
-                SettingRow(
-                    title = "Enable App Lock",
-                    subtitle = "Locks after 3 minutes in background"
-                ) {
-                    Switch(
-                        checked = lockEnabled,
-                        onCheckedChange = vm::setLockEnabled,
-                        colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Purple)
-                    )
+            },
+            confirmButton = {
+                TextButton(onClick = { showThemeDialog = false }) {
+                    Text("Cancel")
                 }
-
-                Spacer(Modifier.height(10.dp))
-
-                SettingRow(
-                    title = "Biometric Unlock",
-                    subtitle = "Use fingerprint or face unlock"
-                ) {
-                    Switch(
-                        checked = useBiometric,
-                        onCheckedChange = vm::setUseBiometric,
-                        enabled = lockEnabled,
-                        colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Purple)
-                    )
-                }
-
-                Spacer(Modifier.height(16.dp))
-
-                Button(
-                    onClick = onOpenPinSetup,
-                    enabled = lockEnabled,
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Purple),
-                    shape = RoundedCornerShape(14.dp)
-                ) { Text(if (pinSet) "Change PIN" else "Set PIN", fontWeight = FontWeight.SemiBold) }
             }
-        }
-
-        Spacer(Modifier.height(20.dp))
+        )
     }
 }
 
 @Composable
-private fun SettingSection(title: String, content: @Composable ColumnScope.() -> Unit) {
-    Column(
+private fun SettingItem(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit
+) {
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(CardBg)
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .clickable(onClick = onClick)
     ) {
-        Text(title, color = TextMed, fontSize = 12.sp, fontWeight = FontWeight.Medium, letterSpacing = 0.5.sp)
-        content()
-    }
-}
-
-@Composable
-private fun SettingRow(title: String, subtitle: String, control: @Composable () -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(title, color = Color.White, fontWeight = FontWeight.Medium)
-            Text(subtitle, color = TextMed, fontSize = 12.sp)
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = "Open",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
-        control()
     }
 }
