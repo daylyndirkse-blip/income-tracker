@@ -61,6 +61,11 @@ dependencies {
   implementation("androidx.fragment:fragment-ktx:1.8.2")
 
   implementation("com.kizitonwose.calendar:compose:2.6.1")
+
+  // Charts library
+  implementation("com.patrykandpatrick.vico:compose:1.13.1")
+  implementation("com.patrykandpatrick.vico:compose-m3:1.13.1")
+  implementation("com.patrykandpatrick.vico:core:1.13.1")
 }
 
 configurations.configureEach {
