@@ -98,7 +98,7 @@ fun AnimatedAmount(
             targetValue = targetValue,
             animationSpec = tween(durationMillis = 1000, easing = FastOutSlowInEasing)
         ) { value, _ ->
-            animatedValue = value.toDouble()
+            animatedValue = value
         }
     }
     
