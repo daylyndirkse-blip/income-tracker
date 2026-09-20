@@ -79,11 +79,7 @@ fun ScaleInAnimation(
         visible = visible,
         enter = scaleIn(
             initialScale = 0.8f,
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessMedium,
-                visibilityThreshold = 0.001f
-            ).run { delay(delay) }
+            animationSpec = tween(durationMillis = 300, delayMillis = delay)
         ) + fadeIn(tween(300, delayMillis = delay)),
         exit = scaleOut(targetScale = 0.8f) + fadeOut(tween(200)),
         content = content
@@ -107,41 +103,4 @@ fun PulseAnimation(
     )
     
     content(scale)
-}
-
-@Composable
-fun ShakeAnimation(
-    shake: Boolean,
-    onShakeComplete: () -> Unit = {},
-    content: @Composable (offsetX: Float) -> Unit
-) {
-    var currentShake by remember { mutableStateOf(shake) }
-    
-    val offsetX by animateFloatAsState(
-        targetValue = if (currentShake) 10f else 0f,
-        animationSpec = repeatable(
-            iterations = 3,
-            animation = tween(50),
-            repeatMode = RepeatMode.Reverse
-        ),
-        finishedListener = {
-            currentShake = false
-            onShakeComplete()
-        },
-        label = "shake"
-    )
-    
-    LaunchedEffect(shake) {
-        if (shake) currentShake = true
-    }
-    
-    content(offsetX)
-}
-
-private fun <T> AnimationSpec<T>.delay(delayMillis: Int): AnimationSpec<T> {
-    return tween<T>(delayMillis = delayMillis).then(this)
-}
-
-private fun <T> AnimationSpec<T>.then(next: AnimationSpec<T>): AnimationSpec<T> {
-    return this
 }
