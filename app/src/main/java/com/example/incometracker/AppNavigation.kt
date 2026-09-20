@@ -15,7 +15,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.incometracker.ui.analytics.AnalyticsScreen
 import com.example.incometracker.ui.calendar.CalendarScreen
 import com.example.incometracker.ui.dashboard.DashboardScreen
-import com.example.incometracker.ui.insights.InsightsScreen
 import com.example.incometracker.ui.profile.ProfileScreen
 import com.example.incometracker.ui.settings.SettingsScreen
 
@@ -23,13 +22,12 @@ sealed class Screen(val route: String, val title: String, val icon: androidx.com
     object Dashboard : Screen("dashboard", "Dashboard", Icons.Default.Home)
     object Analytics : Screen("analytics", "Analytics", Icons.Default.ShowChart)
     object Calendar : Screen("calendar", "Calendar", Icons.Default.CalendarMonth)
-    object Insights : Screen("insights", "Insights", Icons.Default.Lightbulb)
     object Profile : Screen("profile", "Profile", Icons.Default.Person)
     object Settings : Screen("settings", "Settings", Icons.Default.Settings)
 }
 
 @Composable
-fun IncomeApp() {
+fun AppNavigation() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -38,7 +36,6 @@ fun IncomeApp() {
         Screen.Dashboard,
         Screen.Analytics,
         Screen.Calendar,
-        Screen.Insights,
         Screen.Profile
     )
 
@@ -73,8 +70,8 @@ fun IncomeApp() {
         ) {
             composable(Screen.Dashboard.route) {
                 DashboardScreen(
-                    onAddClick = { /* TODO */ },
-                    onSettingsClick = { navController.navigate(Screen.Settings.route) }
+                    onAdd = { },
+                    onEntryClick = { }
                 )
             }
             
@@ -83,16 +80,16 @@ fun IncomeApp() {
             }
             
             composable(Screen.Calendar.route) {
-                CalendarScreen()
-            }
-            
-            composable(Screen.Insights.route) {
-                InsightsScreen()
+                CalendarScreen(
+                    onAddForDate = { },
+                    onEditEntry = { }
+                )
             }
             
             composable(Screen.Profile.route) {
                 ProfileScreen(
-                    onSettingsClick = { navController.navigate(Screen.Settings.route) }
+                    onOpenSettings = { navController.navigate(Screen.Settings.route) },
+                    onOpenPinSetup = { }
                 )
             }
             
